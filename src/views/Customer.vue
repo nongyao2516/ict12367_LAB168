@@ -3,7 +3,7 @@
     <h2 class="mb-3">รายชื่อลูกค้า</h2>
     
     <div class="mb-3">
-      <a class="btn btn-primary" href="#" role="button">Add+</a>
+      <a class="btn btn-primary" href="/add_customer" role="button">Add+</a>
     </div>
 
     <!-- ตารางแสดงข้อมูลลูกค้า -->
@@ -52,7 +52,7 @@ export default {
     // ฟังก์ชันดึงข้อมูลจาก API ด้วย GET
     const fetchCustomers = async () => {
       try {
-        const response = await fetch("http://localhost/project_41970137_week3/php_api/api_customer.php", {
+        const response = await fetch("http://localhost/ict12367_lab168/php_api/show_customer.php", {
           method: "GET",
           headers: {
             "Content-Type": "application/json"
