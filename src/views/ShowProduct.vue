@@ -5,7 +5,7 @@
       <div class="col-md-3" v-for="product in products" :key="product.product_id">
 
         <div class="card shadow-sm mb-4">
-          <img :src="'http://localhost/project_41970137_week3/php_api/uploads/' + product.image" width="70%" height="200" 
+          <img :src="'http://localhost/ICT12367_LAB168/php_api/uploads/' + product.image" width="70%" height="200" 
            class="card-img-top" :alt="product.product_name">
           <div class="card-body text-center">
 
@@ -34,7 +34,7 @@ export default {
     // ฟังก์ชันดึงข้อมูลจาก API ด้วย GET
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost/project_41970137_week3/php_api/show_product.php", {
+        const response = await fetch("http://localhost/ICT12367_LAB168/php_api/show_product.php", {
           method: "GET",
           headers: {
             "Content-Type": "application/json"

@@ -28,7 +28,7 @@
           <td>
             <img
               v-if="product.image"
-              :src="'http://localhost/project_41970137_week3/php_api/uploads/' + product.image"
+              :src="'http://localhost/ICT12367_LAB168/php_api/uploads/' + product.image"
               width="100"
             />
           </td>
@@ -73,28 +73,26 @@
                 <label class="form-label">จำนวน</label>
                 <input v-model="editForm.stock" type="number" class="form-control" required />
               </div>
+
+              <!-- ✅ ส่วนอัปโหลดรูปภาพ -->
               <div class="mb-3">
-  <label class="form-label">รูปภาพ</label>
-  <!-- ✅ required เฉพาะตอนเพิ่มสินค้า -->
-  <input
-    type="file"
-    @change="handleFileUpload"
-    class="form-control"
-    :required="!isEditMode"
-  />
+                <label class="form-label">รูปภาพ</label>
+                <input
+                  type="file"
+                  @change="handleFileUpload"
+                  class="form-control"
+                  :required="!isEditMode"
+                />
 
-  <!-- แสดงรูปเดิมเฉพาะตอนแก้ไข -->
-  <div v-if="isEditMode && editForm.image">
-    <p class="mt-2">รูปเดิม:</p>
-    <img
-      :src="'http://localhost/project_41970137_week3/php_api/uploads/' + editForm.image"
-      width="100"
-    />
-  </div>
-</div>
-
-
-
+                <!-- แสดงรูปเดิมเฉพาะตอนแก้ไข -->
+                <div v-if="isEditMode && editForm.image">
+                  <p class="mt-2">รูปเดิม:</p>
+                  <img
+                    :src="'http://localhost/ICT12367_LAB168/php_api/uploads/' + editForm.image"
+                    width="100"
+                  />
+                </div>
+              </div>
 
               <button type="submit" class="btn btn-success">
                 {{ isEditMode ? "บันทึกการแก้ไข" : "บันทึกสินค้าใหม่" }}
@@ -108,7 +106,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 
 export default {
   name: "ProductList",
@@ -116,7 +114,7 @@ export default {
     const products = ref([]);
     const loading = ref(true);
     const error = ref(null);
-    const isEditMode = ref(false); // ✅ เช็คโหมด
+    const isEditMode = ref(false);
     const editForm = ref({
       product_id: null,
       product_name: "",
@@ -128,10 +126,10 @@ export default {
     const newImageFile = ref(null);
     let modalInstance = null;
 
-    // โหลดข้อมูลสินค้า
+    // ✅ โหลดข้อมูลสินค้า
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost/project_41970137_week3/php_api/api_product.php");
+        const res = await fetch("http://localhost/ICT12367_LAB168/php_api/api_product.php");
         const data = await res.json();
         products.value = data.success ? data.data : [];
       } catch (err) {
@@ -141,43 +139,51 @@ export default {
       }
     };
 
-// เปิด Modal สำหรับเพิ่มสินค้า
-const openAddModal = () => {
-  isEditMode.value = false;
-  editForm.value = {
-    product_id: null,
-    product_name: "",
-    description: "",
-    price: "",
-    stock: "",
-    image: ""
-  };
-  newImageFile.value = null;
-      
-  const modalEl = document.getElementById("editModal");
-  modalInstance = new window.bootstrap.Modal(modalEl);
-  modalInstance.show();
-
-  // ✅ รีเซ็ตค่า input file ให้ไม่แสดงชื่อไฟล์ค้าง
-  const fileInput = modalEl.querySelector('input[type="file"]');
-  if (fileInput) fileInput.value = "";
- };
-
-// เปิด Modal สำหรับแก้ไขสินค้า
-    const openEditModal = (product) => {
-      isEditMode.value = true;
-      editForm.value = { ...product };
+    // ✅ เปิด Modal สำหรับเพิ่มสินค้า
+    const openAddModal = async () => {
+      isEditMode.value = false;
+      editForm.value = {
+        product_id: null,
+        product_name: "",
+        description: "",
+        price: "",
+        stock: "",
+        image: ""
+      };
       newImageFile.value = null;
+
       const modalEl = document.getElementById("editModal");
       modalInstance = new window.bootstrap.Modal(modalEl);
       modalInstance.show();
+
+      // ⚡ ใช้ nextTick เพื่อให้ DOM render เสร็จก่อนค่อยรีเซ็ต input file
+      await nextTick();
+      const fileInput = modalEl.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = "";
     };
 
+    // ✅ เปิด Modal สำหรับแก้ไขสินค้า
+    const openEditModal = async (product) => {
+      isEditMode.value = true;
+      editForm.value = { ...product };
+      newImageFile.value = null;
+
+      const modalEl = document.getElementById("editModal");
+      modalInstance = new window.bootstrap.Modal(modalEl);
+      modalInstance.show();
+
+      // ⚡ รีเซ็ต input file ทุกครั้งเมื่อเปิด modal แก้ไข
+      await nextTick();
+      const fileInput = modalEl.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = "";
+    };
+
+    // ✅ เมื่อผู้ใช้เลือกไฟล์รูป
     const handleFileUpload = (event) => {
       newImageFile.value = event.target.files[0];
     };
 
-// ✅ ใช้ฟังก์ชันเดียวในการเพิ่ม / แก้ไข
+    // ✅ เพิ่ม / แก้ไข สินค้า
     const saveProduct = async () => {
       const formData = new FormData();
       formData.append("action", isEditMode.value ? "update" : "add");
@@ -189,7 +195,7 @@ const openAddModal = () => {
       if (newImageFile.value) formData.append("image", newImageFile.value);
 
       try {
-        const res = await fetch("http://localhost/project_41970137_week3/php_api/api_product.php", {
+        const res = await fetch("http://localhost/ICT12367_LAB168/php_api/api_product.php", {
           method: "POST",
           body: formData
         });
@@ -206,7 +212,7 @@ const openAddModal = () => {
       }
     };
 
-    // ลบสินค้า
+    // ✅ ลบสินค้า
     const deleteProduct = async (id) => {
       if (!confirm("คุณแน่ใจหรือไม่ที่จะลบสินค้านี้?")) return;
 
@@ -215,7 +221,7 @@ const openAddModal = () => {
       formData.append("product_id", id);
 
       try {
-        const res = await fetch("http://localhost/project_41970137_week3/php_api/api_product.php", {
+        const res = await fetch("http://localhost/ICT12367_LAB168/php_api/api_product.php", {
           method: "POST",
           body: formData
         });
