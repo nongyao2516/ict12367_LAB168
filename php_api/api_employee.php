@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
                 move_uploaded_file($_FILES['image']['tmp_name'], $targetFile);
             }
 
-            $sql = "INSERT INTO employee (firstname, lastname, username, password, image)
+            $sql = "INSERT INTO employees (firstname, lastname, username, password, image)
                     VALUES (:firstname, :lastname, :username, :password, :image)";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':firstname', $firstname);
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
             // ถ้ามีการเปลี่ยนรหัสผ่าน ให้เพิ่มใน SQL
             $passwordSQL = $password ? ", password = :password" : "";
 
-            $sql = "UPDATE employee SET 
+            $sql = "UPDATE employees SET 
                         firstname = :firstname,
                         lastname = :lastname,
                         username = :username
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
         // 🧩 ลบพนักงาน
         case 'delete':
             $employee_id = $_POST['employee_id'];
-            $stmt = $conn->prepare("DELETE FROM employee WHERE employee_id = :employee_id");
+            $stmt = $conn->prepare("DELETE FROM employees WHERE employee_id = :employee_id");
             $stmt->bindParam(':employee_id', $employee_id);
             if ($stmt->execute()) {
                 echo json_encode(["message" => "ลบพนักงานสำเร็จ"]);
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
 
 } else {
     // 🧩 ดึงข้อมูลพนักงานทั้งหมด
-    $stmt = $conn->prepare("SELECT employee_id, firstname, lastname, username, image FROM employee ORDER BY employee_id DESC");
+    $stmt = $conn->prepare("SELECT employee_id, firstname, lastname, username, image FROM employees ORDER BY employee_id DESC");
     if ($stmt->execute()) {
         $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(["success" => true, "data" => $employees]);

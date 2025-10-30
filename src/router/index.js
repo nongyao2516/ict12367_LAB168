@@ -56,9 +56,17 @@ const routes = [
     path: '/employees',
     name: 'employees',
     component: () => import('../views/Employee.vue')
+  },
+   {
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/Login.vue')
+  },
+    {
+    path: '/login_admin',
+    name: 'login_admin',
+    component: () => import('../views/Login_admin.vue')
   }
-
-
 
 
 
@@ -69,4 +77,38 @@ const router = createRouter({
   routes
 })
 
-export default router
+// ✅ Navigation Guard
+router.beforeEach((to, from, next) => {
+  const role = localStorage.getItem("role"); // 'admin' | 'customer' | null
+  const isLoggedIn = !!role; // true ถ้ามีการล็อกอิน
+
+  // ✅ ถ้า route ต้องล็อกอิน
+  if (to.meta.requiresAuth) {
+    if (!isLoggedIn) {
+      alert("⚠ กรุณาเข้าสู่ระบบก่อนใช้งานหน้านี้");
+      if (to.meta.role === "admin") next("/login_admin");
+      else next("/login");
+      return;
+    }
+
+    // ✅ ถ้ามีการล็อกอินแต่ role ไม่ตรง (ป้องกันเข้า page ผิด)
+    if (to.meta.role && to.meta.role !== role) {
+      alert("⛔ คุณไม่มีสิทธิ์เข้าหน้านี้");
+      next("/");
+      return;
+    }
+  }
+
+  // ✅ ป้องกันไม่ให้กลับไปหน้า login ถ้าเข้าสู่ระบบแล้ว
+  if ((to.path === "/login" || to.path === "/login_admin") && isLoggedIn) {
+    next("/");
+    return;
+  }
+
+  next();
+});
+
+export default router;
+
+
+

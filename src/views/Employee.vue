@@ -84,7 +84,6 @@
                   type="file"
                   @change="handleFileUpload"
                   class="form-control"
-                  :required="!isEditMode"
                 />
                 <div v-if="isEditMode && editForm.image" class="mt-2">
                   <p>รูปเดิม:</p>
@@ -157,6 +156,7 @@ export default {
       const modalEl = document.getElementById("editModal");
       modalInstance = new window.bootstrap.Modal(modalEl);
       modalInstance.show();
+
       const fileInput = modalEl.querySelector('input[type="file"]');
       if (fileInput) fileInput.value = "";
     };
@@ -166,16 +166,19 @@ export default {
       isEditMode.value = true;
       editForm.value = { ...emp, password: "" };
       newImageFile.value = null;
+
       const modalEl = document.getElementById("editModal");
       modalInstance = new window.bootstrap.Modal(modalEl);
       modalInstance.show();
+
+      const fileInput = modalEl.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = ""; // เคลียร์ input แต่ยังแสดงรูปเดิม
     };
 
     const handleFileUpload = (event) => {
       newImageFile.value = event.target.files[0];
     };
 
-    // บันทึกข้อมูล (เพิ่ม/แก้ไข)
     const saveEmployee = async () => {
       const formData = new FormData();
       formData.append("action", isEditMode.value ? "update" : "add");
@@ -204,7 +207,6 @@ export default {
       }
     };
 
-    // ลบพนักงาน
     const deleteEmployee = async (id) => {
       if (!confirm("คุณแน่ใจหรือไม่ที่จะลบพนักงานนี้?")) return;
 
@@ -246,3 +248,16 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.navbar {
+  background-color: #86bfe7ff !important;
+}
+.nav-link {
+  color: white !important;
+  font-weight: 500;
+}
+.nav-link:hover {
+  text-decoration: underline;
+}
+</style>
