@@ -9,7 +9,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as bootstrap from "bootstrap"; // ⭐ import ทั้งโมดูล
 window.bootstrap = bootstrap; // ✅ ผูกเข้ากับ global window object
 
-
+import Swal from 'sweetalert2'
 
 
 

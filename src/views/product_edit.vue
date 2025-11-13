@@ -213,29 +213,39 @@ export default {
     };
 
     // ✅ ลบสินค้า
-    const deleteProduct = async (id) => {
-      if (!confirm("คุณแน่ใจหรือไม่ที่จะลบสินค้านี้?")) return;
+const deleteProduct = async (id) => {
+  const result = await Swal.fire({
+    title: "ลบสินค้า?",
+    text: "คุณต้องการลบข้อมูลนี้จริงหรือไม่?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "ลบ",
+    cancelButtonText: "ยกเลิก"
+  });
 
-      const formData = new FormData();
-      formData.append("action", "delete");
-      formData.append("product_id", id);
+  if (!result.isConfirmed) return;
 
-      try {
-        const res = await fetch("http://localhost/ICT12367_LAB168/php_api/api_product.php", {
-          method: "POST",
-          body: formData
-        });
-        const result = await res.json();
-        if (result.message) {
-          alert(result.message);
-          products.value = products.value.filter((p) => p.product_id !== id);
-        } else if (result.error) {
-          alert(result.error);
-        }
-      } catch (err) {
-        alert(err.message);
-      }
-    };
+  const formData = new FormData();
+  formData.append("action", "delete");
+  formData.append("product_id", id);
+
+  try {
+    const res = await fetch("http://localhost/ICT12367_LAB168/php_api/api_product.php", {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+
+    Swal.fire("สำเร็จ!", data.message, "success");
+
+    products.value = products.value.filter((p) => p.product_id !== id);
+
+  } catch (err) {
+    Swal.fire("ผิดพลาด", err.message, "error");
+  }
+};
+
+
 
     onMounted(fetchProducts);
 

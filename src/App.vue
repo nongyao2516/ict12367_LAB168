@@ -77,6 +77,9 @@
                   <li><router-link class="dropdown-item" to="/register">Register</router-link></li>
                 </ul>
               </li>
+                <li class="nav-item">
+                <a class="nav-link text-danger" href="#" @click="logout">Logout</a>
+              </li>
             </template>
           </ul>
 
@@ -154,7 +157,7 @@ export default {
         localStorage.removeItem("customer");
         localStorage.removeItem("username");
         this.userRole = "guest";
-        this.$router.push("/");
+        this.$router.push("/");  // ออกระบบ Logout ต้องการให้ไปแสดงหน้าใดให้ระบุส่วนนี้
       }
     },
   },

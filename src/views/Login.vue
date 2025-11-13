@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5" style="max-width:400px;">
-    <h3 class="text-center mb-4">🔐 เข้าสู่ระบบลูกค้า</h3>
+    <h3 class="text-center mb-4">🔐 เข้าสู่ระบบ</h3>
 
     <div class="card p-4 shadow">
       <div class="mb-3">
@@ -24,6 +24,7 @@
 import axios from "axios";
 
 export default {
+  name: "Login",
   data() {
     return {
       username: "",
@@ -34,23 +35,30 @@ export default {
   methods: {
     async login() {
       try {
-        const res = await axios.post("http://localhost/ICT12367_LAB168/php_api/login_customer.php", {
-          username: this.username,
-          password: this.password,
-        });
+        const res = await axios.post(
+          "http://localhost/ICT12367_LAB168/php_api/login.php",
+          {
+            username: this.username,
+            password: this.password,
+          }
+        );
 
         if (res.data.success) {
-          // ✅ บันทึกสถานะ login สำหรับลูกค้า
-          localStorage.setItem("customer", "true");
+          // SET ROLE ถูกต้อง ตรงกับ router
+          localStorage.setItem("status", "customer");
           localStorage.setItem("username", this.username);
+
           this.$router.push("/showproduct");
         } else {
           this.error = res.data.message;
         }
-      } catch (err) {
-        this.error = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+      } catch (error) {
+        this.error = "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
       }
     },
   },
 };
 </script>
+
+<style scoped>
+</style>

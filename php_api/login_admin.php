@@ -17,19 +17,30 @@ $username = trim($data['username']);
 $password = trim($data['password']);
 
 try {
-    $stmt = $conn->prepare("SELECT * FROM employees WHERE username = ? AND password = ?");
-    $stmt->execute([$username, $password]);
+    $stmt = $conn->prepare("SELECT * FROM employees WHERE username = ? ");
+    $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        echo json_encode([
-            "success" => true,
-            "message" => "Login successful.",
-            "user" => [
-                "id" => $user['employee_id'],
-                "username" => $user['username']
-            ]
-        ]);
+      
+        // ✅ ตรวจสอบรหัสผ่านที่เข้ารหัสไว้ในฐานข้อมูล
+        if (password_verify($password, $user['password'])) {
+            echo json_encode([
+                "success" => true,
+                "message" => "Login successful.",
+                "user" => [
+                    "id" => $user['employee_id'],
+                    "username" => $user['username']
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                "success" => false,
+                "message" => "รหัสผ่านไม่ถูกต้อง"
+            ]);
+        }
+
+
     } else {
         echo json_encode([
             "success" => false,
