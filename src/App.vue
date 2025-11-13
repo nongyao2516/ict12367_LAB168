@@ -72,7 +72,7 @@
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Login</a>
                 <ul class="dropdown-menu">
-                  <li><router-link class="dropdown-item" to="/login">Login (User)</router-link></li>
+                  <li><router-link class="dropdown-item" to="/login_customer">Login (User)</router-link></li>
                   <li><router-link class="dropdown-item" to="/login_admin">Login (Admin)</router-link></li>
                   <li><router-link class="dropdown-item" to="/register">Register</router-link></li>
                 </ul>

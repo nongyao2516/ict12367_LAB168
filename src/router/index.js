@@ -58,9 +58,9 @@ const routes = [
     component: () => import('../views/Employee.vue')
   },
    {
-    path: '/login',
-    name: 'login',
-    component: () => import('../views/Login.vue')
+    path: '/login_customer',
+    name: 'login -customer',
+    component: () => import('../views/Login_customer.vue')
   },
     {
     path: '/login_admin',
