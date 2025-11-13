@@ -1,56 +1,56 @@
-<template>
-  <div class="container mt-5" style="max-width:400px;">
-    <h3 class="text-center mb-4">🔐 เข้าสู่ระบบลูกค้า</h3>
+<?php
 
-    <div class="card p-4 shadow">
-      <div class="mb-3">
-        <label class="form-label">ชื่อผู้ใช้</label>
-        <input v-model="username" type="text" class="form-control" />
-      </div>
 
-      <div class="mb-3">
-        <label class="form-label">รหัสผ่าน</label>
-        <input v-model="password" type="password" class="form-control" />
-      </div>
+include 'condb.php'; // ต้องมี PDO connection เช่น $conn = new PDO(...)
 
-      <button @click="login" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
+$data = json_decode(file_get_contents("php://input"), true);
 
-      <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
-    </div>
-  </div>
-</template>
+if (!$data || !isset($data['username']) || !isset($data['password'])) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Invalid input data."
+    ]);
+    exit;
+}
 
-<script>
-import axios from "axios";
+$username = trim($data['username']);
+$password = trim($data['password']);
 
-export default {
-  data() {
-    return {
-      username: "",
-      password: "",
-      error: "",
-    };
-  },
-  methods: {
-    async login() {
-      try {
-        const res = await axios.post("http://localhost/ICT12367_LAB168/php_api/login_customer.php", {
-          username: this.username,
-          password: this.password,
-        });
+try {
+    $stmt = $conn->prepare("SELECT * FROM customers WHERE username = ? ");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (res.data.success) {
-          // ✅ บันทึกสถานะ login สำหรับลูกค้า
-          localStorage.setItem("customer", "true");
-          localStorage.setItem("username", this.username);
-          this.$router.push("/showproduct");
+    if ($user) {
+      
+        // ✅ ตรวจสอบรหัสผ่านที่เข้ารหัสไว้ในฐานข้อมูล
+        if (password_verify($password, $user['password'])) {
+            echo json_encode([
+                "success" => true,
+                "message" => "Login successful.",
+                "user" => [
+                    "id" => $user['customer_id'],
+                    "username" => $user['username']
+                ]
+            ]);
         } else {
-          this.error = res.data.message;
+            echo json_encode([
+                "success" => false,
+                "message" => "รหัสผ่านไม่ถูกต้อง"
+            ]);
         }
-      } catch (err) {
-        this.error = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
-      }
-    },
-  },
-};
-</script>
+
+
+    } else {
+        echo json_encode([
+            "success" => false,
+            "message" => "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"
+        ]);
+    }
+} catch (PDOException $e) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Database error: " . $e->getMessage()
+    ]);
+}
+?>
